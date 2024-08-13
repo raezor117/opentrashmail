@@ -49,7 +49,7 @@ class CustomHandler:
         filenamebase = str(int(round(time.time() * 1000)))
 
         # Get the raw email data
-        raw_email = envelope.content.decode('utf-8')
+        raw_email = envelope.content.decode('latin1')
 
         # Parse the email
         message = BytesParser(policy=policy.default).parsebytes(envelope.content)
@@ -71,9 +71,9 @@ class CustomHandler:
                         return '500 Attachment too large. Max size: ' + str(ATTACHMENTS_MAX_SIZE/1000000)+"MB"
                     attachments['file%d' % len(attachments)] = att
                 else:
-                    plaintext += part.get_payload(decode=True).decode('utf-8')
+                    plaintext += part.get_payload(decode=True).decode('latin1')
             elif part.get_content_type() == 'text/html':
-                html += part.get_payload(decode=True).decode('utf-8')
+                html += part.get_payload(decode=True).decode('latin1')
             else:
                 att = self.handleAttachment(part)
                 if(att == False):
@@ -164,7 +164,7 @@ class CustomHandler:
             cid = part.get('X-Attachment-Id')
         else: # else create a unique id using md5 of the attachment
             cid = hashlib.md5(part.get_payload(decode=True)).hexdigest()
-        fid = hashlib.md5(filename.encode('utf-8')).hexdigest()+filename
+        fid = hashlib.md5(filename.encode('latin1')).hexdigest()+filename
         logger.debug('Handling attachment: "%s" (ID: "%s") of type "%s" with CID "%s"',filename, fid,part.get_content_type(), cid)
 
         if(ATTACHMENTS_MAX_SIZE > 0 and len(part.get_payload(decode=True)) > ATTACHMENTS_MAX_SIZE):
